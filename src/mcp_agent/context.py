@@ -7,13 +7,13 @@ import concurrent.futures
 from typing import TYPE_CHECKING, Any, Optional, Union
 
 from mcp import ServerSession
-from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.propagate import set_global_textmap
-from opentelemetry.sdk.resources import Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
-from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+# from opentelemetry import trace
+# from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+# from opentelemetry.propagate import set_global_textmap
+# from opentelemetry.sdk.resources import Resource
+# from opentelemetry.sdk.trace import TracerProvider
+# from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+# from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 from pydantic import BaseModel, ConfigDict
 
 from mcp_agent.config import Settings, get_settings
@@ -64,54 +64,54 @@ class Context(BaseModel):
     )
 
 
-async def configure_otel(config: "Settings") -> None:
-    """
-    Configure OpenTelemetry based on the application config.
-    """
-    if not config.otel.enabled:
-        return
+# async def configure_otel(config: "Settings") -> None:
+#     """
+#     Configure OpenTelemetry based on the application config.
+#     """
+#     if not config.otel.enabled:
+#         return
 
-    # Check if a provider is already set to avoid re-initialization
-    if trace.get_tracer_provider().__class__.__name__ != "NoOpTracerProvider":
-        return
+#     # Check if a provider is already set to avoid re-initialization
+#     if trace.get_tracer_provider().__class__.__name__ != "NoOpTracerProvider":
+#         return
 
-    # Set up global textmap propagator first
-    set_global_textmap(TraceContextTextMapPropagator())
+#     # Set up global textmap propagator first
+#     set_global_textmap(TraceContextTextMapPropagator())
 
-    service_name = config.otel.service_name
-    service_instance_id = config.otel.service_instance_id
-    service_version = config.otel.service_version
+#     service_name = config.otel.service_name
+#     service_instance_id = config.otel.service_instance_id
+#     service_version = config.otel.service_version
 
-    # Create resource identifying this service
-    resource = Resource.create(
-        attributes={
-            key: value
-            for key, value in {
-                "service.name": service_name,
-                "service.instance.id": service_instance_id,
-                "service.version": service_version,
-            }.items()
-            if value is not None
-        }
-    )
+#     # Create resource identifying this service
+#     resource = Resource.create(
+#         attributes={
+#             key: value
+#             for key, value in {
+#                 "service.name": service_name,
+#                 "service.instance.id": service_instance_id,
+#                 "service.version": service_version,
+#             }.items()
+#             if value is not None
+#         }
+#     )
 
-    # Create provider with resource
-    tracer_provider = TracerProvider(resource=resource)
+#     # Create provider with resource
+#     tracer_provider = TracerProvider(resource=resource)
 
-    # Add exporters based on config
-    otlp_endpoint = config.otel.otlp_endpoint
-    if otlp_endpoint:
-        exporter = OTLPSpanExporter(endpoint=otlp_endpoint)
-        tracer_provider.add_span_processor(BatchSpanProcessor(exporter))
+#     # Add exporters based on config
+#     otlp_endpoint = config.otel.otlp_endpoint
+#     if otlp_endpoint:
+#         exporter = OTLPSpanExporter(endpoint=otlp_endpoint)
+#         tracer_provider.add_span_processor(BatchSpanProcessor(exporter))
 
-        if config.otel.console_debug:
-            tracer_provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
-    else:
-        # Default to console exporter in development
-        tracer_provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
+#         if config.otel.console_debug:
+#             tracer_provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
+#     else:
+#         # Default to console exporter in development
+#         tracer_provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
 
-    # Set as global tracer provider
-    trace.set_tracer_provider(tracer_provider)
+#     # Set as global tracer provider
+#     trace.set_tracer_provider(tracer_provider)
 
 
 async def configure_logger(config: "Settings") -> None:
@@ -130,12 +130,12 @@ async def configure_logger(config: "Settings") -> None:
     )
 
 
-async def configure_usage_telemetry(_config: "Settings") -> None:
-    """
-    Configure usage telemetry based on the application config.
-    TODO: saqadri - implement usage tracking
-    """
-    pass
+# async def configure_usage_telemetry(_config: "Settings") -> None:
+#     """
+#     Configure usage telemetry based on the application config.
+#     TODO: saqadri - implement usage tracking
+#     """
+#     pass
 
 
 async def configure_executor(config: "Settings"):
@@ -172,9 +172,9 @@ async def initialize_context(
     context.server_registry = ServerRegistry(config=config)
 
     # Configure logging and telemetry
-    await configure_otel(config)
+    #await configure_otel(config)
     await configure_logger(config)
-    await configure_usage_telemetry(config)
+    #await configure_usage_telemetry(config)
 
     # Configure the executor
     context.executor = await configure_executor(config)
@@ -184,7 +184,7 @@ async def initialize_context(
     register_asyncio_decorators(context.decorator_registry)
 
     # Store the tracer in context if needed
-    context.tracer = trace.get_tracer(config.otel.service_name)
+    # context.tracer = trace.get_tracer(config.otel.service_name)
 
     if store_globally:
         global _global_context

@@ -17,8 +17,6 @@ requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.115.6",
     "mcp==1.6.0",
-    "opentelemetry-distro>=0.50b0",
-    "opentelemetry-exporter-otlp-proto-http>=1.29.0",
     "protobuf>=4.21,<=5.0",
     "pydantic-settings>=2.7.0",
     "pydantic>=2.10.4",
