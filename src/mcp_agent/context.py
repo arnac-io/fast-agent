@@ -56,7 +56,7 @@ class Context(BaseModel):
     task_registry: Optional[ActivityRegistry] = None
     decorator_registry: Optional[DecoratorRegistry] = None
 
-    tracer: Optional[trace.Tracer] = None
+    # tracer: Optional[trace.Tracer] = None
 
     model_config = ConfigDict(
         extra="allow",
